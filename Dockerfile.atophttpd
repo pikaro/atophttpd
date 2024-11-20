@@ -1,0 +1,25 @@
+FROM debian:bullseye-slim AS builder
+
+# hadolint ignore=DL3008
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    make \
+    git \
+    ca-certificates \
+    libc6-dev \
+    zlib1g-dev \
+    libssl-dev
+
+COPY . /usr/src/atophttpd/
+WORKDIR /usr/src/atophttpd/
+RUN make
+
+FROM debian:bullseye-slim
+
+COPY --from=builder /usr/src/atophttpd/atophttpd /usr/local/bin/
+
+VOLUME /var/log/atophttpd/
+
+ENTRYPOINT ["/usr/local/bin/atophttpd"]
+CMD ["-p", "8080", "-a", "0.0.0.0", "-P", "/var/log/atophttpd/"]

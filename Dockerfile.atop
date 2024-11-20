@@ -1,0 +1,29 @@
+ARG ATOP_PLATFORM=linux/amd64
+FROM --platform=$ATOP_PLATFORM debian:bullseye-slim AS builder
+
+# hadolint ignore=DL3008
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    make \
+    git \
+    ca-certificates \
+    libc6-dev \
+    zlib1g-dev \
+    libssl-dev \
+    libncurses5-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY . /usr/src/atophttpd/
+WORKDIR /usr/src/atophttpd/
+
+RUN make submodule
+
+WORKDIR /usr/src/atophttpd/atop
+
+RUN make CFLAGS=-static
+
+FROM scratch
+
+COPY --from=builder /usr/src/atophttpd/atop/atop /

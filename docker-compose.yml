@@ -1,0 +1,10 @@
+services:
+  atophttpd:
+    init: true
+    build:
+      context: .
+      dockerfile: Dockerfile.atophttpd
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logfiles:/var/log/atophttpd

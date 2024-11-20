@@ -32,5 +32,10 @@ version.o:
 submodule:
 	git submodule update --init --recursive
 
+docker-atop:
+	docker build -f Dockerfile.atop . --output type=local,dest=build
+
+.PHONY: docker-atop
+
 clean:
 	@rm -f $(BIN) *.o *.deb
